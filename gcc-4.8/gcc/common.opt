@@ -1582,6 +1582,10 @@ foptimize-sibling-calls
 Common Report Var(flag_optimize_sibling_calls) Optimization
 Optimize sibling and tail recursive calls
 
+foptimize-sincos
+Common Report Var(flag_optimize_sincos) Optimization
+Optimize calls to sin() and cos() with the same argument to sincos()
+
 fpartial-inlining
 Common Report Var(flag_partial_inlining)
 Perform partial inlining

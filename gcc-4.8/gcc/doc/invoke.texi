@@ -388,7 +388,7 @@ Objective-C and Objective-C++ Dialects}.
 -fno-sched-interblock -fno-sched-spec -fno-signed-zeros @gol
 -fno-toplevel-reorder -fno-trapping-math -fno-zero-initialized-in-bss @gol
 -fomit-frame-pointer -foptimize-register-move -foptimize-sibling-calls @gol
--fpartial-inlining -fpeel-loops -fpredictive-commoning @gol
+-foptimize-sincos -fpartial-inlining -fpeel-loops -fpredictive-commoning @gol
 -fprefetch-loop-arrays -fprofile-report @gol
 -fprofile-correction -fprofile-dir=@var{path} -fprofile-generate @gol
 -fprofile-generate=@var{path} @gol
@@ -6580,6 +6580,7 @@ compilation time.
 -fipa-profile @gol
 -fipa-reference @gol
 -fmerge-constants
+-foptimize-sincos @gol
 -fsplit-wide-types @gol
 -ftree-bit-ccp @gol
 -ftree-builtin-call-dce @gol
@@ -6765,6 +6766,12 @@ Enabled at levels @option{-O}, @option{-O2}, @option{-O3}, @option{-Os}.
 Optimize sibling and tail recursive calls.
 
 Enabled at levels @option{-O2}, @option{-O3}, @option{-Os}.
+
+@item -foptimize-sincos
+@opindex foptimize-sincos
+Optimize calls to sin() and cos() with the same argument to sincos()
+
+Enabled at levels @option{-O}, @option{-O2}, @option{-O3}, @option{-Os}.
 
 @item -fno-inline
 @opindex fno-inline
