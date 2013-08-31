@@ -87,6 +87,16 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198900
     * diagnostic.c (diagnostic_report_current_module): Print file:line
     and file:line:column using locus color.
 
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198736
+2013-05-09  Jan Hubicka  <jh@suse.cz>
+
+    PR lto/54095
+    * symtab.c (insert_to_assembler_name_hash): Handle clones.
+    (unlink_from_assembler_name_hash): Likewise.
+    (symtab_prevail_in_asm_name_hash, symtab_register_node,
+    symtab_unregister_node, symtab_initialize_asm_name_hash,
+    change_decl_assembler_name): Update.
+
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198332
 2013-04-26  Jakub Jelinek  <jakub@redhat.com>
 
@@ -115,6 +125,25 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198331
     * langhooks.c (lhd_print_error_function): Adjust caller.
     * error.c (cp_print_error_function): Adjust file_name_as_prefix
     caller.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198174
+2013-04-22  Andi Kleen  <ak@linux.intel.com>
+
+    * lto/lto.c (print_lto_report_1): Fix LTO report names.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198173
+2013-04-22  Andi Kleen  <ak@linux.intel.com>
+
+    * lto/lto.c (print_lto_report_1): Declare early.
+    (read_cgraph_and_symbols): Call print_lto_report_1 early.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198172
+2013-04-22  Andi Kleen  <ak@linux.intel.com>
+
+    * common.opt (-flto-report-wpa): Add.
+    * doc/invoke.texi (-flto-report-wpa): Add.
+    * lto/lto.c (do_whole_program_analysis): Check for lto-report-wpa.
+    (lto_main): dito.
 
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=197841
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=197842
