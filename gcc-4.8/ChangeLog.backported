@@ -80,6 +80,12 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=201467
     (dump_simple_decl): Likewise.
     (type_to_string): Likewise.
 
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=199606
+2013-06-03  Christophe Lyon  <christophe.lyon@linaro.org>
+
+    * sanitizer_common/sanitizer_linux.cc (MemoryMappingLayout::Next):
+    Cherry pick upstream r182922.
+
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198900
 2013-05-14  Jakub Jelinek  <jakub@redhat.com>
 
@@ -96,6 +102,28 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198736
     (symtab_prevail_in_asm_name_hash, symtab_register_node,
     symtab_unregister_node, symtab_initialize_asm_name_hash,
     change_decl_assembler_name): Update.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198683
+2013-05-07  Christophe Lyon  <christophe.lyon@linaro.org>
+
+    * config/arm/arm.c (arm_asan_shadow_offset): New function.
+    (TARGET_ASAN_SHADOW_OFFSET): Define.
+    * config/arm/linux-eabi.h (ASAN_CC1_SPEC): Define.
+    (LINUX_OR_ANDROID_CC): Add ASAN_CC1_SPEC.
+    * lib/target-supports.exp (check_effective_target_hw): New
+    function.
+    * c-c++-common/asan/clone-test-1.c: Call
+    check_effective_target_hw.
+    * c-c++-common/asan/rlimit-mmap-test-1.c: Likewise.
+    * c-c++-common/asan/heap-overflow-1.c: Update regexps to accept
+    possible decorations.
+    * c-c++-common/asan/null-deref-1.c: Likewise.
+    * c-c++-common/asan/stack-overflow-1.c: Likewise.
+    * c-c++-common/asan/strncpy-overflow-1.c: Likewise.
+    * c-c++-common/asan/use-after-free-1.c: Likewise.
+    * g++.dg/asan/deep-thread-stack-1.C: Likewise.
+    * g++.dg/asan/large-func-test-1.C: Likewise.
+    * configure.tgt: Add ARM pattern.
 
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198332
 2013-04-26  Jakub Jelinek  <jakub@redhat.com>
