@@ -56,8 +56,8 @@ struct gimple_opt_pass pass_tree_loop =
   PROP_cfg,				/* properties_required */
   0,					/* properties_provided */
   0,					/* properties_destroyed */
-  TODO_ggc_collect,			/* todo_flags_start */
-  TODO_verify_ssa | TODO_ggc_collect	/* todo_flags_finish */
+  0,					/* todo_flags_start */
+  TODO_verify_ssa			/* todo_flags_finish */
  }
 };
 
@@ -93,7 +93,7 @@ struct gimple_opt_pass pass_tree_loop_init =
   0,					/* static_pass_number */
   TV_NONE,				/* tv_id */
   PROP_cfg,				/* properties_required */
-  PROP_loops,				/* properties_provided */
+  0,					/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
   0             			/* todo_flags_finish */
@@ -170,7 +170,7 @@ struct gimple_opt_pass pass_tree_unswitch =
   0,					/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
-  TODO_ggc_collect                  	/* todo_flags_finish */
+  0					/* todo_flags_finish */
  }
 };
 
@@ -245,8 +245,7 @@ struct gimple_opt_pass pass_vectorize =
   0,                                    /* properties_provided */
   0,                                    /* properties_destroyed */
   0,					/* todo_flags_start */
-  TODO_update_ssa
-    | TODO_ggc_collect			/* todo_flags_finish */
+  0					/* todo_flags_finish */
  }
 };
 
@@ -492,7 +491,7 @@ struct gimple_opt_pass pass_complete_unroll =
   0,					/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
-  TODO_ggc_collect			/* todo_flags_finish */
+  0					/* todo_flags_finish */
  }
 };
 
@@ -539,8 +538,7 @@ struct gimple_opt_pass pass_complete_unrolli =
   0,					/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
-  TODO_verify_flow
-    | TODO_ggc_collect 			/* todo_flags_finish */
+  TODO_verify_flow			/* todo_flags_finish */
  }
 };
 
@@ -579,7 +577,7 @@ struct gimple_opt_pass pass_parallelize_loops =
   0,					/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
-  0             			/* todo_flags_finish */
+  TODO_verify_flow			/* todo_flags_finish */
  }
 };
 
@@ -654,7 +652,7 @@ struct gimple_opt_pass pass_iv_optimize =
   0,					/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
-  TODO_update_ssa | TODO_ggc_collect	/* todo_flags_finish */
+  TODO_update_ssa			/* todo_flags_finish */
  }
 };
 

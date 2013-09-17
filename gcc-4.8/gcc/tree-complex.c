@@ -28,6 +28,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "tree-iterator.h"
 #include "tree-pass.h"
 #include "tree-ssa-propagate.h"
+#include "cfgloop.h"
 
 
 /* For each complex ssa name, a lattice value.  We're interested in finding
@@ -1139,6 +1140,11 @@ expand_complex_div_wide (gimple_stmt_iterator *gsi, tree inner_type,
       make_edge (bb_cond, bb_false, EDGE_FALSE_VALUE);
       make_edge (bb_true, bb_join, EDGE_FALLTHRU);
       make_edge (bb_false, bb_join, EDGE_FALLTHRU);
+      if (current_loops)
+	{
+	  add_bb_to_loop (bb_true, bb_cond->loop_father);
+	  add_bb_to_loop (bb_false, bb_cond->loop_father);
+	}
 
       /* Update dominance info.  Note that bb_join's data was
          updated by split_block.  */
@@ -1648,9 +1654,8 @@ struct gimple_opt_pass pass_lower_complex =
   PROP_gimple_lcx,			/* properties_provided */
   0,                       		/* properties_destroyed */
   0,					/* todo_flags_start */
-    TODO_ggc_collect
-    | TODO_update_ssa
-    | TODO_verify_stmts	 		/* todo_flags_finish */
+  TODO_update_ssa
+  | TODO_verify_stmts	 		/* todo_flags_finish */
  }
 };
 
@@ -1679,8 +1684,7 @@ struct gimple_opt_pass pass_lower_complex_O0 =
   PROP_gimple_lcx,			/* properties_provided */
   0,					/* properties_destroyed */
   0,					/* todo_flags_start */
-  TODO_ggc_collect
-    | TODO_update_ssa
-    | TODO_verify_stmts	 		/* todo_flags_finish */
+  TODO_update_ssa
+  | TODO_verify_stmts	 		/* todo_flags_finish */
  }
 };

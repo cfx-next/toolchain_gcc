@@ -66,6 +66,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "cfgloop.h"
 #include "tree-vectorizer.h"
 #include "tree-pass.h"
+#include "dbgcnt.h"
 
 /* Loop or bb location.  */
 LOC vect_location;
@@ -74,6 +75,31 @@ LOC vect_location;
 vec<vec_void_p> stmt_vec_info_vec;
 
 
+/* A helper function to free data refs.  */
+
+void
+vect_destroy_datarefs (loop_vec_info loop_vinfo, bb_vec_info bb_vinfo)
+{
+  vec<data_reference_p> datarefs;
+  struct data_reference *dr;
+  unsigned int i;
+
+ if (loop_vinfo)
+    datarefs = LOOP_VINFO_DATAREFS (loop_vinfo);
+  else
+    datarefs = BB_VINFO_DATAREFS (bb_vinfo);
+
+  FOR_EACH_VEC_ELT (datarefs, i, dr)
+    if (dr->aux)
+      {
+        free (dr->aux);
+        dr->aux = NULL;
+      }
+
+  free_data_refs (datarefs);
+}
+
+
 /* Function vectorize_loops.
 
    Entry point to loop vectorization phase.  */
@@ -107,7 +133,7 @@ vectorize_loops (void)
 	vect_location = find_loop_location (loop);
         if (LOCATION_LOCUS (vect_location) != UNKNOWN_LOC
 	    && dump_enabled_p ())
-	  dump_printf (MSG_ALL, "\nAnalyzing loop at %s:%d\n",
+	  dump_printf (MSG_NOTE, "\nAnalyzing loop at %s:%d\n",
                        LOC_FILE (vect_location), LOC_LINE (vect_location));
 
 	loop_vinfo = vect_analyze_loop (loop);
@@ -116,10 +142,13 @@ vectorize_loops (void)
 	if (!loop_vinfo || !LOOP_VINFO_VECTORIZABLE_P (loop_vinfo))
 	  continue;
 
+        if (!dbg_cnt (vect_loop))
+	  break;
+
         if (LOCATION_LOCUS (vect_location) != UNKNOWN_LOC
 	    && dump_enabled_p ())
-          dump_printf (MSG_ALL, "\n\nVectorizing loop at %s:%d\n",
-                       LOC_FILE (vect_location), LOC_LINE (vect_location));
+          dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+                           "loop vectorized\n");
 	vect_transform_loop (loop_vinfo);
 	num_vectorized_loops++;
       }
@@ -129,7 +158,7 @@ vectorize_loops (void)
   statistics_counter_event (cfun, "Vectorized loops", num_vectorized_loops);
   if (dump_enabled_p ()
       || (num_vectorized_loops > 0 && dump_enabled_p ()))
-    dump_printf_loc (MSG_ALL, vect_location,
+    dump_printf_loc (MSG_NOTE, vect_location,
                      "vectorized %u loops in function.\n",
                      num_vectorized_loops);
 
@@ -149,7 +178,16 @@ vectorize_loops (void)
 
   free_stmt_vec_info_vec ();
 
-  return num_vectorized_loops > 0 ? TODO_cleanup_cfg : 0;
+  if (num_vectorized_loops > 0)
+    {
+      /* If we vectorized any loop only virtual SSA form needs to be updated.
+	 ???  Also while we try hard to update loop-closed SSA form we fail
+	 to properly do this in some corner-cases (see PR56286).  */
+      rewrite_into_loop_closed_ssa (NULL, TODO_update_ssa_only_virtuals);
+      return TODO_cleanup_cfg;
+    }
+
+  return 0;
 }
 
 
@@ -168,10 +206,13 @@ execute_vect_slp (void)
 
       if (vect_slp_analyze_bb (bb))
         {
+          if (!dbg_cnt (vect_slp))
+            break;
+
           vect_slp_transform_bb (bb);
           if (dump_enabled_p ())
             dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
-			     "basic block vectorized using SLP\n");
+			     "basic block vectorized\n");
         }
     }
 
@@ -205,8 +246,7 @@ struct gimple_opt_pass pass_slp_vectorize =
   0,                                    /* properties_provided */
   0,                                    /* properties_destroyed */
   0,                                    /* todo_flags_start */
-  TODO_ggc_collect
-    | TODO_verify_ssa
+  TODO_verify_ssa
     | TODO_update_ssa
     | TODO_verify_stmts                 /* todo_flags_finish */
  }

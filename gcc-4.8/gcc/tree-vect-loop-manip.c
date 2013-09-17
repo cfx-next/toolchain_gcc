@@ -1774,7 +1774,7 @@ vect_do_peeling_for_loop_bound (loop_vec_info loop_vinfo, tree *ratio,
   gimple_seq cond_expr_stmt_list = NULL;
 
   if (dump_enabled_p ())
-    dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+    dump_printf_loc (MSG_NOTE, vect_location,
                      "=== vect_do_peeling_for_loop_bound ===");
 
   initialize_original_copy_tables ();
@@ -1828,7 +1828,7 @@ vect_do_peeling_for_loop_bound (loop_vec_info loop_vinfo, tree *ratio,
   if (check_profitability)
     max_iter = MAX (max_iter, (int) th - 1);
   record_niter_bound (new_loop, double_int::from_shwi (max_iter), false, true);
-  dump_printf (MSG_OPTIMIZED_LOCATIONS,
+  dump_printf (MSG_NOTE,
                "Setting upper bound of nb iterations for epilogue "
                "loop to %d\n", max_iter);
 
@@ -1893,7 +1893,7 @@ vect_gen_niters_for_prolog_loop (loop_vec_info loop_vinfo, tree loop_niters, int
       int npeel = LOOP_PEELING_FOR_ALIGNMENT (loop_vinfo);
 
       if (dump_enabled_p ())
-        dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+        dump_printf_loc (MSG_NOTE, vect_location,
                          "known peeling = %d.", npeel);
 
       iters = build_int_cst (niters_type, npeel);
@@ -1948,9 +1948,9 @@ vect_gen_niters_for_prolog_loop (loop_vec_info loop_vinfo, tree loop_niters, int
 
   if (dump_enabled_p ())
     {
-      dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+      dump_printf_loc (MSG_NOTE, vect_location,
                        "niters for prolog loop: ");
-      dump_generic_expr (MSG_OPTIMIZED_LOCATIONS, TDF_SLIM, iters);
+      dump_generic_expr (MSG_NOTE, TDF_SLIM, iters);
     }
 
   var = create_tmp_var (niters_type, "prolog_loop_niters");
@@ -2005,7 +2005,7 @@ vect_update_inits_of_drs (loop_vec_info loop_vinfo, tree niters)
   struct data_reference *dr;
  
  if (dump_enabled_p ())
-    dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+    dump_printf_loc (MSG_NOTE, vect_location,
                      "=== vect_update_inits_of_dr ===");
 
   FOR_EACH_VEC_ELT (datarefs, i, dr)
@@ -2035,7 +2035,8 @@ vect_do_peeling_for_alignment (loop_vec_info loop_vinfo,
 
   if (dump_enabled_p ())
     dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
-                     "=== vect_do_peeling_for_alignment ===");
+                     "loop peeled for vectorization to enhance"
+                     " alignment\n");
 
   initialize_original_copy_tables ();
 
@@ -2062,7 +2063,7 @@ vect_do_peeling_for_alignment (loop_vec_info loop_vinfo,
   if (check_profitability)
     max_iter = MAX (max_iter, (int) th - 1);
   record_niter_bound (new_loop, double_int::from_shwi (max_iter), false, true);
-  dump_printf (MSG_OPTIMIZED_LOCATIONS,
+  dump_printf (MSG_NOTE,
                "Setting upper bound of nb iterations for prologue "
                "loop to %d\n", max_iter);
 
@@ -2349,11 +2350,11 @@ vect_create_cond_for_alias_checks (loop_vec_info loop_vinfo,
 
       if (dump_enabled_p ())
 	{
-	  dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location, 
+	  dump_printf_loc (MSG_NOTE, vect_location,
                            "create runtime check for data references ");
-	  dump_generic_expr (MSG_OPTIMIZED_LOCATIONS, TDF_SLIM, DR_REF (dr_a));
-	  dump_printf (MSG_OPTIMIZED_LOCATIONS, " and ");
-	  dump_generic_expr (MSG_OPTIMIZED_LOCATIONS, TDF_SLIM, DR_REF (dr_b));
+	  dump_generic_expr (MSG_NOTE, TDF_SLIM, DR_REF (dr_a));
+	  dump_printf (MSG_NOTE, " and ");
+	  dump_generic_expr (MSG_NOTE, TDF_SLIM, DR_REF (dr_b));
 	}
 
       seg_a_min = addr_base_a;
@@ -2379,7 +2380,7 @@ vect_create_cond_for_alias_checks (loop_vec_info loop_vinfo,
     }
 
   if (dump_enabled_p ())
-    dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+    dump_printf_loc (MSG_NOTE, vect_location,
 		     "created %u versioning for alias checks.\n",
 		     may_alias_ddrs.length ());
 }
@@ -2421,6 +2422,8 @@ vect_loop_versioning (loop_vec_info loop_vinfo,
   unsigned prob = 4 * REG_BR_PROB_BASE / 5;
   gimple_seq gimplify_stmt_list = NULL;
   tree scalar_loop_iters = LOOP_VINFO_NITERS (loop_vinfo);
+  bool version_align = LOOP_REQUIRES_VERSIONING_FOR_ALIGNMENT (loop_vinfo);
+  bool version_alias = LOOP_REQUIRES_VERSIONING_FOR_ALIAS (loop_vinfo);
 
   if (check_profitability)
     {
@@ -2430,11 +2433,11 @@ vect_loop_versioning (loop_vec_info loop_vinfo,
 					  is_gimple_condexpr, NULL_TREE);
     }
 
-  if (LOOP_REQUIRES_VERSIONING_FOR_ALIGNMENT (loop_vinfo))
+  if (version_align)
     vect_create_cond_for_align_checks (loop_vinfo, &cond_expr,
 				       &cond_expr_stmt_list);
 
-  if (LOOP_REQUIRES_VERSIONING_FOR_ALIAS (loop_vinfo))
+  if (version_alias)
     vect_create_cond_for_alias_checks (loop_vinfo, &cond_expr,
 				       &cond_expr_stmt_list);
 
@@ -2445,6 +2448,20 @@ vect_loop_versioning (loop_vec_info loop_vinfo,
   initialize_original_copy_tables ();
   loop_version (loop, cond_expr, &condition_bb,
 		prob, prob, REG_BR_PROB_BASE - prob, true);
+
+  if (LOCATION_LOCUS (vect_location) != UNKNOWN_LOC
+      && dump_enabled_p ())
+    {
+      if (version_alias)
+        dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+                         "loop versioned for vectorization because of "
+			 "possible aliasing\n");
+      if (version_align)
+        dump_printf_loc (MSG_OPTIMIZED_LOCATIONS, vect_location,
+                         "loop versioned for vectorization to enhance "
+			 "alignment\n");
+
+    }
   free_original_copy_tables();
 
   /* Loop versioning violates an assumption we try to maintain during
