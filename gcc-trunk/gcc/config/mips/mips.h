@@ -884,7 +884,7 @@ struct mips_cpu_info {
    FP madd and msub instructions, and the FP recip and recip sqrt
    instructions.  */
 #define ISA_HAS_FP4		((ISA_MIPS4				\
-				  || (ISA_MIPS32R2 && TARGET_FLOAT64)	\
+				  || ISA_MIPS32R2			\
 				  || ISA_MIPS64				\
 				  || ISA_MIPS64R2)			\
 				 && !TARGET_MIPS16)
