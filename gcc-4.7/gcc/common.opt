@@ -698,6 +698,10 @@ Wvector-operation-performance
 Common Var(warn_vector_operation_performance) Warning
 Warn when a vector operation is compiled outside the SIMD
 
+Wwrong-language
+Common Var(warn_wrong_language) Init (1) Warning
+Warn when a flag is used on the incorrect language.
+
 Xassembler
 Driver Separate
 
