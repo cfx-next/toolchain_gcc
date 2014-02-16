@@ -110,6 +110,28 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=202049
     PR middle-end/58257
     * c-c++-common/gomp/pr58257.c: New test.
 
+http://gcc.gnu.org/viewcvs/gcc?view=revision&revision=205720
+2013-12-05  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59044
+	PR c++/59052
+	* pt.c (most_specialized_class): Use the partially instantiated
+	template for deduction.  Drop the TMPL parameter.
+
+http://gcc.gnu.org/viewcvs?rev=203874&root=gcc&view=rev
+2013-10-20  Chris Jefferson  <chris@bubblescope.net>
+	    Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR libstdc++/58800
+	* include/bits/stl_algo.h (__unguarded_partition_pivot): Change
+	__last - 2 to __last - 1.
+	* testsuite/25_algorithms/nth_element/58800.cc: New
+
+http://gcc.gnu.org/viewcvs/gcc?view=revision&revision=204203
+2013-10-30  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	PR target/58854
+	* config/arm/arm.c (arm_expand_epilogue_apcs_frame): Emit blockage.
+
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=201780
 2013-08-16  Jakub Jelinek  <jakub@redhat.com>
 
